@@ -7,7 +7,7 @@ var config = {
     "host": "http://127.0.0.1",
     "token": ""
 }
-if (!fs.existsSync('config.json')) fs.writeFileSync('config.json', JSON.stringify(config))
+if (!fs.existsSync('config.json')) fs.writeFileSync('config.json', JSON.stringify(config, null, '\t'))
 process.env = JSON.parse(fs.readFileSync('config.json'))
 
 app.on('ready', () => {
@@ -37,7 +37,6 @@ const express = require('express')
 const exp = express()
 exp.listen(3000, () => {
     console.log('Server started on port 3000')
-    setTimeout(() => {process.Window.loadURL('http://localhost:3000')}, 3000)
 })
 exp.set('view engine', 'ejs')
 exp.use('/assets', express.static('assets'))
@@ -54,4 +53,12 @@ fs.readdirSync('./app').forEach(file => {
 //! Login Verify
 //!
 
-fetch(`${process.env.host}/`)
+fetch(`${process.env.host}/user?token=${process.env.token}`)
+    .then(res => {
+        if (res.status === 200) {
+            process.Window.loadURL('http://localhost:3000')
+        } else {
+            process.Window.loadFile('./public/login.html')
+        }
+    })
+    .catch(err => console.log(err))
